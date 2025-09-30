@@ -1,9 +1,8 @@
-This repo contents the all about shell scripting for DEVOPD engineer 
+Shell Scripting for DEVOPS
 <br>
-
-basics: 
-1) installatin process
-2) SETUP environment
+ 
+<h1>1) Installation & Envirnment Setup process </h1>
+2) 
 3) editors vim,vi,gedit
 4) variables
 5) functions
