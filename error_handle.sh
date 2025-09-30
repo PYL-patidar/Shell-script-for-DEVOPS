@@ -8,6 +8,7 @@ comment
 
 create_dir(){
 	mkdir demo
+	
 }
 
 if ! create_dir ; then 

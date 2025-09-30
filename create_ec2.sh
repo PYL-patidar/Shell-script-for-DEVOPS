@@ -19,8 +19,9 @@ install_awscli(){
 
 	echo "installation started of AWS-ClI in linux........"
 
-	curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-	unzip awscliv2.zip
+	curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+	sudo apt-get install -y unzip &> /dev/null
+	unzip -q awscliv2.zip
 	sudo ./aws/install
 
 	#verify installtion
@@ -30,16 +31,20 @@ install_awscli(){
 	rm -rf awscliv2.zip ./aws
 }
 
-wait_for_instance(){
-
+wait_for_instance() {
 	local instance_id="$1"
 
 	echo "Waiting for instance $instance_id to be in running state..."
 
-	while true;
+	while true ;
 	do
-		state=$(aws ec2 describe-instance --instance-ids "$instance_id" --query 'Reservation[0].Instance[0].state.Name' --output text)
-		if [["$state" == "running" ]];then
+		state=$(aws ec2 describe-instances
+	       	--instance-ids "$instance_id" \
+	       	--query 'Reservations[0].Instances[0].State.Name' \
+	       	--output text)
+
+
+		if [[ "$state" == "running" ]] ; then
 			echo "Instance $instance_id  is now running."
 		        break
 		fi
@@ -49,31 +54,23 @@ wait_for_instance(){
 }
 
 
+create_EC2_instance() {
+	local ami_id="$1"
+	local instance_type="$2"
+	local key_name="$3"
+	local subnet_id="$4"
+	local security_group="$5"
+	local instance_name="$6"
 
-
-
-create_EC2_instance(){
-
-	echo "creating EC2 instance processing......."
-
-	local instance_name="$1"
-	local AMI_ID="$2"
-	local instance_type="$3"
-	local key_name="$4"
-	local subnet_ID="$5"
-	local security_group="$6"
-
-	#RUN AWS CLI commant to create ec2 instance 
-	instance_id=$(aws ec2 run-instances \ 
-		--image-id "$AMI_ID" \
+	instance_id=$(aws ec2 run-instances \
+		--image-id "$ami_id" \
 		--instance-type "$instance_type" \
 		--key-name "$key_name" \
-		--subnet-id "$subnet_ID" \
+		--subnet-id "$subnet_id" \
 		--security-group-ids "$security_group" \
-		--tag-specification "ResourceType=instance, Tags=[{Key=Name,Value=instance_name}]" \
-
-		--query 'Instance[0].InstanceId' \
-i	--output text
+		--tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$instance_name}]" \
+		--query 'Instances[0].InstanceId' \
+		--output text
 	)
 
 
@@ -100,15 +97,15 @@ main(){
 	echo "Create EC2 instance......"
 
 	#specify the parameters for creating the EC2 instance
-	INSTANCE_NAME="Shell-script-EC2-instance" 
 	AMI_ID="ami-02d26659fd82cf299"
 	INSTANCE_TYPE="t3.micro"
 	KEY_NAME="Linux-VM-key"
-	SUBNET_ID="subnet-07ebbae2fb6ae3eb5"
-	SECURITY_GROUP="sg-0881f650935b19656"
+	SUBNET_ID="subnet-04f1ed8f604920b26"
+	SECURITY_GROUP="sg-04cf7414996b2b540"
+	INSTANCE_NAME="Shell-script-EC2-instance"
 
 	#call the function to create the EC2 instance 
-	create_EC2_instance "$INSTANCE_NAME" "$AMI_ID" "$INSTANCE_TYPE" "$KEY_NAME" "$SUBNET_ID" "$SECURITY_GROUP"
+	create_EC2_instance "$AMI_ID" "$INSTANCE_TYPE" "$KEY_NAME" "$SUBNET_ID" "$SECURITY_GROUP" "$INSTANCE_NAME"
 
 	echo "EC2 instance creation completed...."
 }
