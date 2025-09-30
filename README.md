@@ -1,4 +1,4 @@
-Shell Scripting for DEVOPS
+<b>Shell Scripting for DEVOPS</b>
 <br>
  
 <h2> 1) Installation & Envirnment Setup process </h2><br>
