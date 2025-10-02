@@ -73,7 +73,6 @@ create_EC2_instance() {
 		--output text
 	)
 
-
 	if [[ -z "$instance_id" ]] ; then
 		echo "Fail to create instance."
 		exit 1
